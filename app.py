@@ -17,7 +17,7 @@ def enqueue_data():
     new_user = Users(
         lat=users_content['lat'],
         lon=users_content['lon'],
-        order_id = users_content['order_id']
+        driver_name = users_content['driver_name']
     )
     db.session.add(new_user)
     db.session.commit()
@@ -37,7 +37,7 @@ def get_all():
             'lat' : user.lat,
             'lon' : user.lon,
             'timestamp' : user.timestamp.isoformat(),
-            'order_id' : user.order_id
+            'driver_name' : user.driver_name
         }
         user_list.append(user_data)
     return jsonify({"drivers": user_list}), 200
@@ -55,7 +55,7 @@ def dequeue_data():
                 'lat': user.lat,
                 'lon': user.lon,
                 'timestamp': user.timestamp.isoformat(),
-                'order_id': user.order_id
+                'driver_name': user.driver_name
             }
             db.session.delete(user)
             user_list.append(user_data)
@@ -71,10 +71,11 @@ def dequeue_data():
         db.session.delete(data)
         db.session.commit()
 
-        return jsonify({'lat': data.lat,
+        return jsonify({
+                'lat': data.lat,
                 'lon': data.lon,
                 'timestamp': data.timestamp.isoformat(),
-                'order_id': data.order_id}), 200
+                'driver_name': data.driver_name}), 200
     
 if __name__ == '__main__':
     app.run(debug=True)

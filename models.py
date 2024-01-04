@@ -6,4 +6,4 @@ class Users(db.Model):
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    order_id = db.Column(db.String)
+    driver_name = db.Column(db.String)
