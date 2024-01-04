@@ -64,7 +64,7 @@ def dequeue_data():
     
     elif 'users' in request.args:
         print(request.args['users'])
-        data = Users.query.filter_by(order_id=request.args['users']).first()
+        data = Users.query.filter_by(driver_name=request.args['users']).first()
         if data is None:
             return jsonify({"message": "Queue is empty"}), 404
         
