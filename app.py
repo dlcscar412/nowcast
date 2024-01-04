@@ -27,40 +27,54 @@ def enqueue_data():
 @app.route('/all', methods=['GET'])
 def get_all():
     users = Users.query.all()
+    if users is None:
+        return jsonify({"message": "Queue is empty"}), 404
+    
     user_list = []
     for user in users:
         user_data = {
-            'id': user.id,
-            'lat': user.lat,
-            'lon': user.lon,
-            'timestamp': user.timestamp.isoformat(),
-            'order_id': user.order_id
+            'id' : user.id,
+            'lat' : user.lat,
+            'lon' : user.lon,
+            'timestamp' : user.timestamp.isoformat(),
+            'order_id' : user.order_id
         }
         user_list.append(user_data)
-
-    return jsonify({"orders": user_list})
+    return jsonify({"drivers": user_list}), 200
 
 @app.route('/dequeue', methods=['GET'])
 def dequeue_data():
-    data = Users.query.first()
-
-    if data is None:
-        return jsonify({"message": "Queue is empty"}), 404
-
-    db.session.delete(data)
-    db.session.commit()
-
-    user_data = {
-            
-        }
-
-    return jsonify({'lat': data.lat,
-            'lon': data.lon,
-            'timestamp': data.timestamp.isoformat(),
-            'order_id': data.order_id}), 200
-
-if __name__ == '__main__':
+    if len(request.args)==0:
+        drivers = Users.query.group_by(Users.order_id).all()
+        if drivers is None:
+            return jsonify({"message": "Queue is empty"}), 404
+        
+        user_list = []
+        for user in drivers:
+            user_data = {
+                'lat': user.lat,
+                'lon': user.lon,
+                'timestamp': user.timestamp.isoformat(),
+                'order_id': user.order_id
+            }
+            db.session.delete(user)
+            user_list.append(user_data)
+        db.session.commit()
+        return jsonify({"drivers": user_list})
     
-    print(db)
-    print("tite")
+    elif 'users' in request.args:
+        print(request.args['users'])
+        data = Users.query.filter_by(order_id=request.args['users']).first()
+        if data is None:
+            return jsonify({"message": "Queue is empty"}), 404
+        
+        db.session.delete(data)
+        db.session.commit()
+
+        return jsonify({'lat': data.lat,
+                'lon': data.lon,
+                'timestamp': data.timestamp.isoformat(),
+                'order_id': data.order_id}), 200
+    
+if __name__ == '__main__':
     app.run(debug=True)
