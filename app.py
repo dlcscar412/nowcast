@@ -45,7 +45,7 @@ def get_all():
 @app.route('/dequeue', methods=['GET'])
 def dequeue_data():
     if len(request.args)==0:
-        drivers = Users.query.group_by(Users.order_id).all()
+        drivers = Users.query.group_by(Users.driver_name).all()
         if drivers is None:
             return jsonify({"message": "Queue is empty"}), 404
         
